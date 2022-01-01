@@ -3,6 +3,7 @@ package cz.nikolaslada.accountmanager.rest;
 import cz.nikolaslada.accountmanager.mappers.UserMapper;
 import cz.nikolaslada.accountmanager.repositories.UserJpaRepository;
 import cz.nikolaslada.accountmanager.repositories.entities.UserEntity;
+import cz.nikolaslada.accountmanager.rest.domains.requests.CurrentUserRequest;
 import cz.nikolaslada.accountmanager.rest.domains.requests.NewUserRequest;
 import cz.nikolaslada.accountmanager.rest.domains.responses.UserResponse;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +33,19 @@ public class UserApi {
     )
     public UserResponse post(@RequestBody @Valid NewUserRequest request) {
         UserEntity entity = UserMapper.INSTANCE.newUserRequestToUserEntity(request, true, ZonedDateTime.now());
-        this.userJpaRepository.create(entity);
+        this.userJpaRepository.createOrUpdate(entity);
+        return UserMapper.INSTANCE.userEntityToUserResponse(entity);
+    }
+
+    @PatchMapping(
+            value = "/user/{id}",
+            produces = { "application/json" },
+            consumes = { "application/json" }
+    )
+    public UserResponse patch(@PathVariable Long id, @RequestBody @Valid CurrentUserRequest request) {
+        UserEntity currentEntity = this.userJpaRepository.findById(id);
+        UserEntity entity = UserMapper.INSTANCE.currentUserRequestToUserEntity(request, ZonedDateTime.now(), currentEntity);
+        this.userJpaRepository.createOrUpdate(currentEntity);
         return UserMapper.INSTANCE.userEntityToUserResponse(entity);
     }
 

@@ -21,7 +21,7 @@ public class UserJpaRepository {
         return this.entityManager.find(UserEntity.class, id);
     }
 
-    public long create(UserEntity userEntity) {
+    public long createOrUpdate(UserEntity userEntity) {
         this.session.save(userEntity);
         return userEntity.getId();
     }

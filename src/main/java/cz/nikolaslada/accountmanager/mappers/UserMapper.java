@@ -1,6 +1,7 @@
 package cz.nikolaslada.accountmanager.mappers;
 
 import cz.nikolaslada.accountmanager.repositories.entities.UserEntity;
+import cz.nikolaslada.accountmanager.rest.domains.requests.CurrentUserRequest;
 import cz.nikolaslada.accountmanager.rest.domains.requests.NewUserRequest;
 import cz.nikolaslada.accountmanager.rest.domains.responses.UserResponse;
 import org.mapstruct.Mapper;
@@ -28,6 +29,29 @@ public interface UserMapper {
                 request.getPassword(),
                 currentDateTime,
                 null
+        );
+    };
+
+    default UserEntity currentUserRequestToUserEntity(
+            CurrentUserRequest request,
+            ZonedDateTime currentDateTime,
+            UserEntity currentEntity
+    ) {
+        String email = request.getEmail();
+        String firstName = request.getFirstName();
+        String surname = request.getSurname();
+        Boolean active = request.getActive();
+        String password = request.getPassword();
+
+        return new UserEntity(
+                currentEntity.getId(),
+                email == null ? currentEntity.getEmail() : email,
+                firstName == null ? currentEntity.getFirstName() : firstName,
+                surname == null ? currentEntity.getSurname() : surname,
+                active == null ? currentEntity.isActive() : active.booleanValue(),
+                password == null ? currentEntity.getPassword() : password,
+                currentEntity.getCreatedAt(),
+                currentDateTime
         );
     };
 
