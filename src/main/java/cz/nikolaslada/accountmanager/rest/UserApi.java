@@ -6,6 +6,8 @@ import cz.nikolaslada.accountmanager.repositories.entities.UserEntity;
 import cz.nikolaslada.accountmanager.rest.domains.requests.CurrentUserRequest;
 import cz.nikolaslada.accountmanager.rest.domains.requests.NewUserRequest;
 import cz.nikolaslada.accountmanager.rest.domains.responses.UserResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -47,6 +49,12 @@ public class UserApi {
         UserEntity entity = UserMapper.INSTANCE.currentUserRequestToUserEntity(request, ZonedDateTime.now(), currentEntity);
         this.userJpaRepository.createOrUpdate(currentEntity);
         return UserMapper.INSTANCE.userEntityToUserResponse(entity);
+    }
+
+    @DeleteMapping("/user/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        this.userJpaRepository.deleteById(id);
+        return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
     }
 
 }
